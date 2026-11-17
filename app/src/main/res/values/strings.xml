@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Laras Audio</string>
+    <string name="nav_library">Pustaka</string>
+    <string name="nav_playlists">Daftar Putar</string>
+    <string name="nav_equalizer">Studio Suara</string>
+    <string name="action_scan_device">Pindai Musik Perangkat</string>
+    <string name="action_import_audio">Impor File Audio</string>
+    <string name="action_shuffle_all">Acak Semua</string>
+    <string name="action_play_all">Putar Semua</string>
+    <string name="search_placeholder">Cari lagu, artis, atau album…</string>
+    <string name="lyrics_title">Lirik Tersinkronisasi</string>
+    <string name="lyrics_tap_hint">Ketuk baris lirik untuk melompat ke durasi</string>
+    <string name="lyrics_import_lrc">Muat File Lirik (.lrc)</string>
+    <string name="sleep_timer_title">Sleep Timer</string>
+    <string name="equalizer_title">Equalizer Kustom</string>
+    <string name="settings_title">Pengaturan</string>
+</resources>
