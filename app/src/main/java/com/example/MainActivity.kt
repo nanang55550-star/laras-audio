@@ -125,6 +125,7 @@ fun LarasAudioApp(
     val sleepTimerState by viewModel.sleepTimerState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val formatFilter by viewModel.formatFilter.collectAsStateWithLifecycle()
+    val sortOrder by viewModel.sortOrder.collectAsStateWithLifecycle()
     val hasAudioPermission by viewModel.hasAudioPermission.collectAsStateWithLifecycle()
     val isScanning by viewModel.isScanning.collectAsStateWithLifecycle()
 
@@ -234,6 +235,7 @@ fun LarasAudioApp(
                         isPlaying = playbackState.isPlaying,
                         searchQuery = searchQuery,
                         formatFilter = formatFilter,
+                        sortOrder = sortOrder,
                         equalizerState = equalizerState,
                         bottomContentPadding = PaddingValues(bottom = 24.dp),
                         onOpenSettings = { showSettings = true },
@@ -361,6 +363,7 @@ fun LarasAudioApp(
                         isPlaying = playbackState.isPlaying,
                         searchQuery = searchQuery,
                         formatFilter = formatFilter,
+                        sortOrder = sortOrder,
                         equalizerState = equalizerState,
                         bottomContentPadding = innerPadding,
                         onOpenSettings = { showSettings = true },
@@ -535,6 +538,7 @@ private fun MainTabContent(
     isPlaying: Boolean,
     searchQuery: String,
     formatFilter: com.example.model.FormatFilter,
+    sortOrder: com.example.model.SongSortOrder,
     equalizerState: com.example.model.EqualizerState,
     bottomContentPadding: PaddingValues,
     onOpenSettings: () -> Unit,
@@ -550,9 +554,11 @@ private fun MainTabContent(
                 isPlaying = isPlaying,
                 searchQuery = searchQuery,
                 selectedFilter = formatFilter,
+                sortOrder = sortOrder,
                 bottomContentPadding = bottomContentPadding,
                 onSearchQueryChange = viewModel::updateSearchQuery,
                 onSelectFilter = viewModel::selectFormatFilter,
+                onSelectSortOrder = viewModel::setSortOrder,
                 onOpenSettings = onOpenSettings,
                 onPlayTrack = { track -> onPlayTrack(track, filteredTracks) },
                 onPlayAll = viewModel::playAll,

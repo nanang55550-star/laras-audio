@@ -15,6 +15,7 @@ import com.example.model.FormatFilter
 import com.example.model.LrcParser
 import com.example.model.LyricLine
 import com.example.model.SleepTimerState
+import com.example.model.SongSortOrder
 import com.example.player.AudioEffectsController
 import com.example.player.PlaybackController
 import com.example.player.PlaybackSnapshot
@@ -40,6 +41,9 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     private val _formatFilter = MutableStateFlow(FormatFilter.ALL)
     val formatFilter: StateFlow<FormatFilter> = _formatFilter.asStateFlow()
 
+    private val _sortOrder = MutableStateFlow(SongSortOrder.DEFAULT)
+    val sortOrder: StateFlow<SongSortOrder> = _sortOrder.asStateFlow()
+
     private val _hasAudioPermission = MutableStateFlow(false)
     val hasAudioPermission: StateFlow<Boolean> = _hasAudioPermission.asStateFlow()
 
@@ -55,10 +59,11 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     val filteredTracks: StateFlow<List<AudioTrack>> = combine(
         allTracks,
         _searchQuery,
-        _formatFilter
-    ) { tracks, query, filter ->
+        _formatFilter,
+        _sortOrder
+    ) { tracks, query, filter, sort ->
         val q = query.trim().lowercase()
-        tracks.filter { track ->
+        val filtered = tracks.filter { track ->
             val matchesFormat = when (filter) {
                 FormatFilter.ALL -> true
                 FormatFilter.FLAC -> track.format == AudioFormat.FLAC
@@ -71,6 +76,15 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
                 track.artist.lowercase().contains(q) ||
                 track.album.lowercase().contains(q)
             matchesFormat && matchesQuery
+        }
+
+        when (sort) {
+            SongSortOrder.DEFAULT -> filtered
+            SongSortOrder.TITLE_AZ -> filtered.sortedBy { it.title.lowercase() }
+            SongSortOrder.TITLE_ZA -> filtered.sortedByDescending { it.title.lowercase() }
+            SongSortOrder.ARTIST_AZ -> filtered.sortedBy { it.artist.lowercase() }
+            SongSortOrder.DURATION_SHORTEST -> filtered.sortedBy { it.durationMs }
+            SongSortOrder.DURATION_LONGEST -> filtered.sortedByDescending { it.durationMs }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -140,7 +154,17 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val shuffle = repository.shuffleEnabled.first()
             val repeat = repository.repeatMode.first()
+            val savedSort = repository.songSortOrder.first()
+            _sortOrder.value = savedSort
             playbackController.setShuffleAndRepeat(shuffle, repeat)
+        }
+    }
+
+    fun setSortOrder(order: SongSortOrder) {
+        _sortOrder.value = order
+        viewModelScope.launch {
+            repository.setSongSortOrder(order)
+            _uiMessages.tryEmit("Urutan diubah ke: ${order.label}")
         }
     }
 

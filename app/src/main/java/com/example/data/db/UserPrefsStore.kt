@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.model.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -28,6 +29,7 @@ class UserPrefsStore(private val context: Context) {
         val EQ_PRESET_NAME = stringPreferencesKey("eq_preset_name")
         val SHUFFLE_ENABLED = booleanPreferencesKey("shuffle_enabled")
         val REPEAT_MODE = intPreferencesKey("repeat_mode")
+        val SONG_SORT_ORDER = stringPreferencesKey("song_sort_order")
     }
 
     val eqPreferences: Flow<EqPreferences> = context.dataStore.data.map { prefs ->
@@ -48,6 +50,10 @@ class UserPrefsStore(private val context: Context) {
 
     val shuffleEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHUFFLE_ENABLED] ?: false }
     val repeatMode: Flow<Int> = context.dataStore.data.map { it[Keys.REPEAT_MODE] ?: 0 }
+    val songSortOrder: Flow<SongSortOrder> = context.dataStore.data.map { prefs ->
+        val name = prefs[Keys.SONG_SORT_ORDER]
+        runCatching { SongSortOrder.valueOf(name ?: "") }.getOrDefault(SongSortOrder.DEFAULT)
+    }
 
     suspend fun saveEqPreferences(eq: EqPreferences) {
         context.dataStore.edit { prefs ->
@@ -65,5 +71,9 @@ class UserPrefsStore(private val context: Context) {
 
     suspend fun setRepeatMode(mode: Int) {
         context.dataStore.edit { it[Keys.REPEAT_MODE] = mode }
+    }
+
+    suspend fun setSongSortOrder(order: SongSortOrder) {
+        context.dataStore.edit { it[Keys.SONG_SORT_ORDER] = order.name }
     }
 }

@@ -20,6 +20,7 @@ object BundledCatalog {
                 qualityLabel = "FLAC · 44.1 kHz",
                 artworkResId = R.drawable.img_album_nocturne,
                 isBundled = true,
+                folderSource = "Bundled",
                 lyricsRaw = """
                     [ti:Nocturne Emas]
                     [ar:Kuartet Senyap]
@@ -44,6 +45,7 @@ object BundledCatalog {
                 qualityLabel = "MP3 · 320 kbps",
                 artworkResId = R.drawable.img_album_senja,
                 isBundled = true,
+                folderSource = "Bundled",
                 lyricsRaw = """
                     [ti:Senja di Obsidian]
                     [ar:Raka Pratama]
@@ -68,6 +70,7 @@ object BundledCatalog {
                 qualityLabel = "WAV · 16-bit PCM",
                 artworkResId = R.drawable.img_album_gema,
                 isBundled = true,
+                folderSource = "Bundled",
                 lyricsRaw = """
                     [ti:Gema Harmoni]
                     [ar:Studio Laras]

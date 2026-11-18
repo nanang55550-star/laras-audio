@@ -59,8 +59,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.rounded.Sort
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import com.example.model.AudioTrack
 import com.example.model.FormatFilter
+import com.example.model.SongSortOrder
 import com.example.ui.components.TrackListItem
 import com.example.ui.theme.IvoryText
 import com.example.ui.theme.ObsidianCard
@@ -80,9 +84,11 @@ fun LibraryScreen(
     isPlaying: Boolean,
     searchQuery: String,
     selectedFilter: FormatFilter,
+    sortOrder: SongSortOrder,
     bottomContentPadding: PaddingValues,
     onSearchQueryChange: (String) -> Unit,
     onSelectFilter: (FormatFilter) -> Unit,
+    onSelectSortOrder: (SongSortOrder) -> Unit,
     onOpenSettings: () -> Unit,
     onPlayTrack: (AudioTrack) -> Unit,
     onPlayAll: () -> Unit,
@@ -178,6 +184,58 @@ fun LibraryScreen(
                                 contentDescription = if (searchVisible) "Tutup pencarian" else "Cari lagu",
                                 tint = if (searchVisible) WarmGold else SoftGold
                             )
+                        }
+                    }
+
+                    var sortMenuExpanded by remember { mutableStateOf(false) }
+
+                    Box {
+                        Surface(
+                            shape = CircleShape,
+                            color = ObsidianCard,
+                            border = BorderStroke(1.dp, SubtleOutline)
+                        ) {
+                            IconButton(
+                                onClick = { sortMenuExpanded = true },
+                                modifier = Modifier
+                                    .minimumInteractiveComponentSize()
+                                    .testTag("library_sort_button")
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Sort,
+                                    contentDescription = "Urutkan daftar lagu",
+                                    tint = SoftGold
+                                )
+                            }
+                        }
+
+                        DropdownMenu(
+                            expanded = sortMenuExpanded,
+                            onDismissRequest = { sortMenuExpanded = false },
+                            modifier = Modifier.background(ObsidianCard)
+                        ) {
+                            Text(
+                                text = "Urutkan Berdasarkan",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = WarmGold,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                            HorizontalDivider(color = SubtleOutline)
+                            SongSortOrder.entries.forEach { order ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = order.label,
+                                            color = if (order == sortOrder) WarmGold else IvoryText
+                                        )
+                                    },
+                                    onClick = {
+                                        onSelectSortOrder(order)
+                                        sortMenuExpanded = false
+                                    },
+                                    modifier = Modifier.testTag("sort_option_${order.name}")
+                                )
+                            }
                         }
                     }
 

@@ -34,6 +34,15 @@ enum class FormatFilter(val label: String) {
     OTHER("Lainnya")
 }
 
+enum class SongSortOrder(val label: String) {
+    DEFAULT("Terbaru / Bawaan"),
+    TITLE_AZ("Judul (A–Z)"),
+    TITLE_ZA("Judul (Z–A)"),
+    ARTIST_AZ("Artis (A–Z)"),
+    DURATION_SHORTEST("Durasi Terpendek"),
+    DURATION_LONGEST("Durasi Terpanjang")
+}
+
 data class AudioTrack(
     val id: String,
     val title: String,
@@ -47,7 +56,8 @@ data class AudioTrack(
     val artworkUri: String? = null,
     val isBundled: Boolean = false,
     val isFavorite: Boolean = false,
-    val lyricsRaw: String? = null
+    val lyricsRaw: String? = null,
+    val folderSource: String = "Penyimpanan Perangkat"
 )
 
 fun formatDuration(ms: Long): String {

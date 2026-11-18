@@ -14,6 +14,7 @@ import com.example.data.db.UserPrefsStore
 import com.example.model.AudioFormat
 import com.example.model.AudioTrack
 import com.example.model.EqualizerPreset
+import com.example.model.SongSortOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -38,6 +39,7 @@ class MusicRepository(private val context: Context) {
     val eqPreferences: Flow<EqPreferences> = prefs.eqPreferences
     val shuffleEnabled: Flow<Boolean> = prefs.shuffleEnabled
     val repeatMode: Flow<Int> = prefs.repeatMode
+    val songSortOrder: Flow<SongSortOrder> = prefs.songSortOrder
 
     val allTracks: Flow<List<AudioTrack>> = combine(
         deviceTracksFlow,
@@ -196,4 +198,5 @@ class MusicRepository(private val context: Context) {
 
     suspend fun setShuffleEnabled(enabled: Boolean) = prefs.setShuffleEnabled(enabled)
     suspend fun setRepeatMode(mode: Int) = prefs.setRepeatMode(mode)
+    suspend fun setSongSortOrder(order: SongSortOrder) = prefs.setSongSortOrder(order)
 }

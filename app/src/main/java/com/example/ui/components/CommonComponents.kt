@@ -295,6 +295,19 @@ fun TrackListItem(
                             color = DimGray
                         )
                         FormatBadge(format = track.format)
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = ObsidianElevated,
+                            border = BorderStroke(0.5.dp, SubtleOutline)
+                        ) {
+                            Text(
+                                text = "📁 ${track.folderSource}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SoftGold,
+                                maxLines = 1,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
                         Text(
                             text = formatDuration(track.durationMs),
                             style = MaterialTheme.typography.labelSmall,
@@ -322,6 +335,19 @@ fun TrackListItem(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         FormatBadge(format = track.format)
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = ObsidianElevated,
+                            border = BorderStroke(0.5.dp, SubtleOutline)
+                        ) {
+                            Text(
+                                text = "📁 ${track.folderSource}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = SoftGold,
+                                maxLines = 1,
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
+                            )
+                        }
                         Text(
                             text = formatDuration(track.durationMs),
                             style = MaterialTheme.typography.labelSmall,

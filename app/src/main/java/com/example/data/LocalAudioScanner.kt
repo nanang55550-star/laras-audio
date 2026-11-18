@@ -34,6 +34,9 @@ class LocalAudioScanner(private val context: Context) {
             add(MediaStore.Audio.Media.DISPLAY_NAME)
             @Suppress("DEPRECATION")
             add(MediaStore.Audio.Media.DATA)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                add(MediaStore.Audio.Media.RELATIVE_PATH)
+            }
             add(MediaStore.Audio.Media.IS_MUSIC)
         }.toTypedArray()
 
@@ -58,6 +61,7 @@ class LocalAudioScanner(private val context: Context) {
                 val displayNameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
                 @Suppress("DEPRECATION")
                 val dataCol = cursor.getColumnIndex(MediaStore.Audio.Media.DATA)
+                val relativePathCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH) else -1
 
                 val albumArtBase = Uri.parse("content://media/external/audio/albumart")
 
@@ -84,6 +88,22 @@ class LocalAudioScanner(private val context: Context) {
                     } else null
 
                     val filePath = if (dataCol >= 0) cursor.getString(dataCol) else null
+                    val relativePath = if (relativePathCol >= 0) cursor.getString(relativePathCol) else null
+
+                    val folderSource = when {
+                        !relativePath.isNullOrBlank() -> relativePath.trim().removeSuffix("/").ifBlank { "Penyimpanan Lokal" }
+                        !filePath.isNullOrBlank() -> {
+                            val file = File(filePath)
+                            val parent = file.parentFile?.name
+                            if (parent.isNullOrBlank() || parent.equals("0", ignoreCase = true) || parent.equals("emulated", ignoreCase = true)) {
+                                "Penyimpanan Lokal"
+                            } else {
+                                parent
+                            }
+                        }
+                        else -> "Penyimpanan Perangkat"
+                    }
+
                     val sidecarLyrics = readSidecarLrcIfExists(filePath)
 
                     val qualityLabel = when (format) {
@@ -107,7 +127,8 @@ class LocalAudioScanner(private val context: Context) {
                             qualityLabel = qualityLabel,
                             artworkUri = artworkUri,
                             isBundled = false,
-                            lyricsRaw = sidecarLyrics
+                            lyricsRaw = sidecarLyrics,
+                            folderSource = folderSource
                         )
                     )
                 }
@@ -161,7 +182,8 @@ class LocalAudioScanner(private val context: Context) {
                 uriString = uri.toString(),
                 format = format,
                 qualityLabel = quality,
-                isBundled = false
+                isBundled = false,
+                folderSource = "Impor"
             )
         }.getOrNull()
     }
