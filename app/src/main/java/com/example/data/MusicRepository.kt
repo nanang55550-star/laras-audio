@@ -59,7 +59,8 @@ class MusicRepository(private val context: Context) {
                 uriString = entity.uriString,
                 format = runCatching { AudioFormat.valueOf(entity.formatName) }.getOrDefault(AudioFormat.OTHER),
                 qualityLabel = entity.qualityLabel,
-                isBundled = false
+                isBundled = false,
+                dateAddedMillis = entity.addedAt
             )
         }
 

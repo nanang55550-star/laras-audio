@@ -16,6 +16,7 @@ import com.example.model.LrcParser
 import com.example.model.LyricLine
 import com.example.model.SleepTimerState
 import com.example.model.SongSortOrder
+import com.example.model.sortTracks
 import com.example.player.AudioEffectsController
 import com.example.player.PlaybackController
 import com.example.player.PlaybackSnapshot
@@ -41,7 +42,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
     private val _formatFilter = MutableStateFlow(FormatFilter.ALL)
     val formatFilter: StateFlow<FormatFilter> = _formatFilter.asStateFlow()
 
-    private val _sortOrder = MutableStateFlow(SongSortOrder.DEFAULT)
+    private val _sortOrder = MutableStateFlow(SongSortOrder.NEWEST_FIRST)
     val sortOrder: StateFlow<SongSortOrder> = _sortOrder.asStateFlow()
 
     private val _hasAudioPermission = MutableStateFlow(false)
@@ -78,14 +79,7 @@ class MusicViewModel(application: Application) : AndroidViewModel(application) {
             matchesFormat && matchesQuery
         }
 
-        when (sort) {
-            SongSortOrder.DEFAULT -> filtered
-            SongSortOrder.TITLE_AZ -> filtered.sortedBy { it.title.lowercase() }
-            SongSortOrder.TITLE_ZA -> filtered.sortedByDescending { it.title.lowercase() }
-            SongSortOrder.ARTIST_AZ -> filtered.sortedBy { it.artist.lowercase() }
-            SongSortOrder.DURATION_SHORTEST -> filtered.sortedBy { it.durationMs }
-            SongSortOrder.DURATION_LONGEST -> filtered.sortedByDescending { it.durationMs }
-        }
+        sortTracks(filtered, sort)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val favoriteTracks: StateFlow<List<AudioTrack>> = allTracks.map { list ->

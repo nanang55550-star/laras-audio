@@ -59,6 +59,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Sort
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -222,12 +223,23 @@ fun LibraryScreen(
                             )
                             HorizontalDivider(color = SubtleOutline)
                             SongSortOrder.entries.forEach { order ->
+                                val isSelected = order == sortOrder
                                 DropdownMenuItem(
                                     text = {
                                         Text(
                                             text = order.label,
-                                            color = if (order == sortOrder) WarmGold else IvoryText
+                                            color = if (isSelected) WarmGold else IvoryText
                                         )
+                                    },
+                                    trailingIcon = {
+                                        if (isSelected) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = "Aktif",
+                                                tint = WarmGold,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
                                     },
                                     onClick = {
                                         onSelectSortOrder(order)

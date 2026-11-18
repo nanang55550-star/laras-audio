@@ -51,8 +51,7 @@ class UserPrefsStore(private val context: Context) {
     val shuffleEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.SHUFFLE_ENABLED] ?: false }
     val repeatMode: Flow<Int> = context.dataStore.data.map { it[Keys.REPEAT_MODE] ?: 0 }
     val songSortOrder: Flow<SongSortOrder> = context.dataStore.data.map { prefs ->
-        val name = prefs[Keys.SONG_SORT_ORDER]
-        runCatching { SongSortOrder.valueOf(name ?: "") }.getOrDefault(SongSortOrder.DEFAULT)
+        SongSortOrder.fromStorageValue(prefs[Keys.SONG_SORT_ORDER])
     }
 
     suspend fun saveEqPreferences(eq: EqPreferences) {

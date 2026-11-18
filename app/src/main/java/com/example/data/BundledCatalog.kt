@@ -21,6 +21,7 @@ object BundledCatalog {
                 artworkResId = R.drawable.img_album_nocturne,
                 isBundled = true,
                 folderSource = "Bundled",
+                dateAddedMillis = 0L,
                 lyricsRaw = """
                     [ti:Nocturne Emas]
                     [ar:Kuartet Senyap]
@@ -46,6 +47,7 @@ object BundledCatalog {
                 artworkResId = R.drawable.img_album_senja,
                 isBundled = true,
                 folderSource = "Bundled",
+                dateAddedMillis = 0L,
                 lyricsRaw = """
                     [ti:Senja di Obsidian]
                     [ar:Raka Pratama]
@@ -71,6 +73,7 @@ object BundledCatalog {
                 artworkResId = R.drawable.img_album_gema,
                 isBundled = true,
                 folderSource = "Bundled",
+                dateAddedMillis = 0L,
                 lyricsRaw = """
                     [ti:Gema Harmoni]
                     [ar:Studio Laras]

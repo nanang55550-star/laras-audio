@@ -35,12 +35,22 @@ enum class FormatFilter(val label: String) {
 }
 
 enum class SongSortOrder(val label: String) {
-    DEFAULT("Terbaru / Bawaan"),
+    NEWEST_FIRST("Terbaru (Atas)"),
+    OLDEST_FIRST("Terbaru (Bawah) / Terlama"),
     TITLE_AZ("Judul (A–Z)"),
     TITLE_ZA("Judul (Z–A)"),
     ARTIST_AZ("Artis (A–Z)"),
     DURATION_SHORTEST("Durasi Terpendek"),
-    DURATION_LONGEST("Durasi Terpanjang")
+    DURATION_LONGEST("Durasi Terpanjang");
+
+    companion object {
+        fun fromStorageValue(raw: String?): SongSortOrder {
+            if (raw.isNullOrBlank() || raw == "DEFAULT") {
+                return NEWEST_FIRST
+            }
+            return entries.firstOrNull { it.name == raw } ?: NEWEST_FIRST
+        }
+    }
 }
 
 data class AudioTrack(
@@ -57,8 +67,19 @@ data class AudioTrack(
     val isBundled: Boolean = false,
     val isFavorite: Boolean = false,
     val lyricsRaw: String? = null,
-    val folderSource: String = "Penyimpanan Perangkat"
+    val folderSource: String = "Penyimpanan Perangkat",
+    val dateAddedMillis: Long = 0L
 )
+
+fun sortTracks(tracks: List<AudioTrack>, sortOrder: SongSortOrder): List<AudioTrack> = when (sortOrder) {
+    SongSortOrder.NEWEST_FIRST -> tracks.sortedByDescending { it.dateAddedMillis }
+    SongSortOrder.OLDEST_FIRST -> tracks.sortedBy { it.dateAddedMillis }
+    SongSortOrder.TITLE_AZ -> tracks.sortedBy { it.title.lowercase() }
+    SongSortOrder.TITLE_ZA -> tracks.sortedByDescending { it.title.lowercase() }
+    SongSortOrder.ARTIST_AZ -> tracks.sortedBy { it.artist.lowercase() }
+    SongSortOrder.DURATION_SHORTEST -> tracks.sortedBy { it.durationMs }
+    SongSortOrder.DURATION_LONGEST -> tracks.sortedByDescending { it.durationMs }
+}
 
 fun formatDuration(ms: Long): String {
     if (ms <= 0L) return "00:00"

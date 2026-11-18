@@ -32,6 +32,8 @@ class LocalAudioScanner(private val context: Context) {
             add(MediaStore.Audio.Media.DURATION)
             add(MediaStore.Audio.Media.MIME_TYPE)
             add(MediaStore.Audio.Media.DISPLAY_NAME)
+            add(MediaStore.Audio.Media.DATE_MODIFIED)
+            add(MediaStore.Audio.Media.DATE_ADDED)
             @Suppress("DEPRECATION")
             add(MediaStore.Audio.Media.DATA)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -59,6 +61,8 @@ class LocalAudioScanner(private val context: Context) {
                 val durationCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
                 val mimeCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.MIME_TYPE)
                 val displayNameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                val dateModifiedCol = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED)
+                val dateAddedCol = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED)
                 @Suppress("DEPRECATION")
                 val dataCol = cursor.getColumnIndex(MediaStore.Audio.Media.DATA)
                 val relativePathCol = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH) else -1
@@ -76,6 +80,8 @@ class LocalAudioScanner(private val context: Context) {
                     val duration = cursor.getLong(durationCol)
                     val mime = cursor.getString(mimeCol)
                     val displayName = cursor.getString(displayNameCol)
+                    val dateModifiedSec = if (dateModifiedCol >= 0) cursor.getLong(dateModifiedCol) else 0L
+                    val dateAddedSec = if (dateAddedCol >= 0) cursor.getLong(dateAddedCol) else 0L
                     val ext = displayName?.substringAfterLast('.', "")
                     val format = AudioFormat.fromExtensionOrMime(ext, mime)
 
@@ -89,6 +95,11 @@ class LocalAudioScanner(private val context: Context) {
 
                     val filePath = if (dataCol >= 0) cursor.getString(dataCol) else null
                     val relativePath = if (relativePathCol >= 0) cursor.getString(relativePathCol) else null
+                    val dateAddedMillis = resolveTimestampMillis(
+                        dateModifiedSec = dateModifiedSec,
+                        dateAddedSec = dateAddedSec,
+                        filePath = filePath
+                    )
 
                     val folderSource = when {
                         !relativePath.isNullOrBlank() -> relativePath.trim().removeSuffix("/").ifBlank { "Penyimpanan Lokal" }
@@ -128,7 +139,8 @@ class LocalAudioScanner(private val context: Context) {
                             artworkUri = artworkUri,
                             isBundled = false,
                             lyricsRaw = sidecarLyrics,
-                            folderSource = folderSource
+                            folderSource = folderSource,
+                            dateAddedMillis = dateAddedMillis
                         )
                     )
                 }
@@ -183,7 +195,8 @@ class LocalAudioScanner(private val context: Context) {
                 format = format,
                 qualityLabel = quality,
                 isBundled = false,
-                folderSource = "Impor"
+                folderSource = "Impor",
+                dateAddedMillis = System.currentTimeMillis()
             )
         }.getOrNull()
     }
@@ -203,5 +216,26 @@ class LocalAudioScanner(private val context: Context) {
                 lrcFile.readText()
             } else null
         }.getOrNull()
+    }
+
+    companion object {
+        internal fun resolveTimestampMillis(
+            dateModifiedSec: Long,
+            dateAddedSec: Long,
+            filePath: String?
+        ): Long {
+            val mediaStoreMillis = when {
+                dateModifiedSec > 0L -> dateModifiedSec * 1000L
+                dateAddedSec > 0L -> dateAddedSec * 1000L
+                else -> 0L
+            }
+            if (mediaStoreMillis > 0L) return mediaStoreMillis
+
+            if (!filePath.isNullOrBlank()) {
+                val lastModified = runCatching { File(filePath).lastModified() }.getOrDefault(0L)
+                if (lastModified > 0L) return lastModified
+            }
+            return 0L
+        }
     }
 }
